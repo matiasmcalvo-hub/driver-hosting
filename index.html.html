@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Driver de Distribución Hosting</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:#111;min-height:100vh}
+  body{color:#e8e8e0;font-family:'DM Sans',sans-serif}
+  .wrap{background:#111;min-height:100vh;padding:0 0 4rem}
+  .topbar{font-size:11px;letter-spacing:.15em;color:#666;padding:2rem 2.5rem 0;text-transform:uppercase}
+  .hero{padding:1.5rem 2.5rem 2rem}
+  .hero h1{font-family:'Playfair Display',serif;font-size:clamp(2.2rem,5vw,3.4rem);line-height:1.1;color:#f0ede6;max-width:700px}
+  .hero h1 .x{color:#4a8fff;font-style:normal}
+  .hero p{margin-top:.75rem;font-size:14px;color:#888;max-width:560px;line-height:1.6}
+  .tabs{display:flex;gap:0;border-bottom:1px solid #2a2a2a;padding:0 2.5rem;margin-bottom:2rem}
+  .tab{padding:.6rem 0;margin-right:2rem;font-size:13px;color:#555;cursor:pointer;border-bottom:2px solid transparent}
+  .tab.active{color:#f0ede6;border-bottom-color:#4a8fff}
+  .tab span{color:#4a8fff;margin-right:.4rem;font-size:11px}
+  .content{padding:0 2.5rem;max-width:900px}
+  .input-section{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:1.2rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap}
+  .input-section label{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#666;display:block;margin-bottom:.3rem}
+  .input-section input[type=number]{background:#111;border:1px solid #333;color:#f0ede6;border-radius:8px;padding:.4rem .8rem;font-size:1rem;width:90px;text-align:center;font-family:'DM Sans',sans-serif}
+  .input-section input[type=number]:focus{outline:none;border-color:#4a8fff}
+  .pct-symbol{color:#888;font-size:.9rem;margin-left:.2rem}
+  .soc-pills{display:flex;gap:.6rem;margin-left:auto;flex-wrap:wrap;align-items:center}
+  .pill{padding:.35rem 1rem;border-radius:20px;font-size:13px;font-weight:500}
+  .pill-eba{background:#1a3a5c;color:#7ab8f5}
+  .pill-mpb{background:#3a1a3a;color:#d47af5}
+  .section-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#555;margin-bottom:.75rem}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  thead tr th{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#555;font-weight:400;padding:.5rem .8rem;border-bottom:1px solid #2a2a2a;text-align:left}
+  thead tr th:not(:first-child){text-align:right}
+  tbody tr td{padding:.65rem .8rem;border-bottom:1px solid #1e1e1e;color:#bbb}
+  tbody tr td:not(:first-child){text-align:right}
+  tbody tr.eba td{background:#0d1e2e}
+  tbody tr.mpb td{background:#1e0d2e}
+  tbody tr.total-row td{font-weight:500;font-size:13px;color:#888;background:#161616;border-top:1px solid #2a2a2a}
+  .soc-badge{font-size:11px;padding:.2rem .6rem;border-radius:10px;font-weight:500;margin-right:.3rem}
+  .soc-badge.eba{background:#1a3a5c;color:#7ab8f5}
+  .soc-badge.mpb{background:#3a1a3a;color:#d47af5}
+  .pct-val{font-weight:500;color:#e8e8e0}
+  .pct-bar-wrap{display:inline-flex;align-items:center;gap:.5rem}
+  .pct-bar{height:4px;border-radius:2px;display:inline-block;min-width:2px}
+  .bar-eba{background:#4a8fff}
+  .bar-mpb{background:#b45fff}
+  .highlight{color:#f0ede6;font-weight:500}
+  .note{font-size:12px;color:#555;margin-top:1rem;font-style:italic}
+  @media(max-width:600px){
+    .hero{padding:1rem 1rem 1.5rem}
+    .content{padding:0 1rem}
+    .topbar{padding:1.5rem 1rem 0}
+    .tabs{padding:0 1rem}
+    .soc-pills{margin-left:0}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">Reporte interno &nbsp;·&nbsp; FinOps</div>
+  <div class="hero">
+    <h1>Driver de Distribución <span class="x">×</span> Hosting</h1>
+    <p>Distribución de costos por CECO según share sociedad. Modificá el % de EBA para recalcular automáticamente todos los porcentajes por CECO.</p>
+  </div>
+  <div class="tabs">
+    <div class="tab active"><span>/ 01</span> Distribución por CECO</div>
+  </div>
+  <div class="content">
+    <div class="input-section">
+      <div>
+        <label>% EBA</label>
+        <input type="number" id="eba-input" min="0" max="100" step="0.01" value="64.16">
+        <span class="pct-symbol">%</span>
+      </div>
+      <div>
+        <label>% MPB (auto)</label>
+        <span id="mpb-display" style="font-size:1rem;color:#d47af5;font-weight:500">35.84 %</span>
+      </div>
+      <div class="soc-pills">
+        <span class="pill pill-eba">EBA · <span id="eba-pill">64.16%</span></span>
+        <span class="pill pill-mpb">MPB · <span id="mpb-pill">35.84%</span></span>
+      </div>
+    </div>
+    <div class="section-label">Detalle por CECO</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Sociedad</th>
+          <th>CECO</th>
+          <th>Share sociedad</th>
+          <th>% por CECO</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+    <p class="note">* Los CECOs sin share sociedad se muestran con 0.00%. El % por CECO = Share sociedad ÷ % sociedad.</p>
+  </div>
+</div>
+<script>
+const data = [
+  {soc:'EBA', ceco:'4550112199', share:0.4751},
+  {soc:'EBA', ceco:'4550112200', share:null},
+  {soc:'EBA', ceco:'4550112300', share:0.0011},
+  {soc:'EBA', ceco:'4550112400', share:0.0468},
+  {soc:'EBA', ceco:'4550112500', share:0.0005},
+  {soc:'EBA', ceco:'4550112630', share:0.1496},
+  {soc:'MPB', ceco:'4550130200', share:0.2930},
+  {soc:'MPB', ceco:'4550130250', share:0.0325},
+  {soc:'MPB', ceco:'4550130260', share:0.0013},
+];
+
+function fmt(v){return (v*100).toFixed(2)+'%'}
+
+function render(){
+  const ebaVal = parseFloat(document.getElementById('eba-input').value)||0;
+  const mpbVal = 100 - ebaVal;
+  document.getElementById('mpb-display').textContent = mpbVal.toFixed(2)+' %';
+  document.getElementById('eba-pill').textContent = ebaVal.toFixed(2)+'%';
+  document.getElementById('mpb-pill').textContent = mpbVal.toFixed(2)+'%';
+
+  const ebaDen = ebaVal/100;
+  const mpbDen = mpbVal/100;
+
+  let ebaTotalShare=0, ebaTotalPct=0, mpbTotalShare=0, mpbTotalPct=0;
+  let html='';
+  data.forEach(r=>{
+    const isEba = r.soc==='EBA';
+    const den = isEba ? ebaDen : mpbDen;
+    const shareNum = r.share||0;
+    const pct = den>0 ? shareNum/den : 0;
+    if(isEba){ebaTotalShare+=shareNum;ebaTotalPct+=pct;}
+    else{mpbTotalShare+=shareNum;mpbTotalPct+=pct;}
+    const barW = Math.round(pct*60);
+    const barClass = isEba?'bar-eba':'bar-mpb';
+    html+=`<tr class="${isEba?'eba':'mpb'}">
+      <td><span class="soc-badge ${isEba?'eba':'mpb'}">${r.soc}</span></td>
+      <td class="highlight">${r.ceco}</td>
+      <td>${r.share!=null?fmt(r.share):'—'}</td>
+      <td><span class="pct-bar-wrap"><span class="pct-bar ${barClass}" style="width:${barW}px"></span><span class="pct-val">${fmt(pct)}</span></span></td>
+    </tr>`;
+  });
+  html+=`<tr class="total-row"><td colspan="2">Total EBA</td><td>${fmt(ebaTotalShare)}</td><td>${fmt(ebaTotalPct)}</td></tr>`;
+  html+=`<tr class="total-row"><td colspan="2">Total MPB</td><td>${fmt(mpbTotalShare)}</td><td>${fmt(mpbTotalPct)}</td></tr>`;
+  document.getElementById('table-body').innerHTML=html;
+}
+
+document.getElementById('eba-input').addEventListener('input', render);
+render();
+</script>
+</body>
+</html>
